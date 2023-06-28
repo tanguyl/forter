@@ -1,14 +1,12 @@
 Nonterminals
-expression statement
+statement expression.
 
 Terminals 
-identifier
+identifier program_start program_end.
 
 Rootsymbol statement.
-Endsymbol statement.
 
-statement -> program_start identifier.
-statement -> program_end identifier.
+statement -> program_start identifier: {program_start, '$2'}.
+statement -> program_end identifier: {program_end, '$2'}.
 
 Erlang code.
-
