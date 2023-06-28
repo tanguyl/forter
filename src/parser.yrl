@@ -1,12 +1,16 @@
 Nonterminals
-statement expression.
+statements statement start.
 
 Terminals 
-identifier program_start program_end.
+identifier token_start token_end token_endl.
 
-Rootsymbol statement.
+Rootsymbol statements.
 
-statement -> program_start identifier: {program_start, '$2'}.
-statement -> program_end identifier: {program_end, '$2'}.
+statements -> statement statements.
+statements -> statement.
+
+statement -> token_start identifier token_endl: {'$1', '$2'}.
+statement -> token_end identifier token_endl: {'$1', '$2'}.
+statement -> token_endl.
 
 Erlang code.

@@ -10,4 +10,4 @@ parse(String)->
     {ok, Tokens, _} = lexer:string(String),
     io:format("Tokens are:~n~w~n", [Tokens]),
     Parse  = parser:parse(Tokens),
-    io:format("~w~n", [Parse]).
+    Parse.
