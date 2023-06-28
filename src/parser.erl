@@ -1,6 +1,6 @@
 -module(parser).
 -export([parse/1, parse_and_scan/1, format_error/1]).
--file("/home/bigbug/forter/src/parser.yrl", 16).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 16).
 
 -file("/usr/lib/erlang/lib/parsetools-2.3.2/include/yeccpre.hrl", 0).
 %%
@@ -181,7 +181,7 @@ yecctoken2string1(Other) ->
 
 
 
--file("/home/bigbug/forter/src/parser.erl", 184).
+-file("/home/bigbug/lapacke/forter/src/parser.erl", 184).
 
 -dialyzer({nowarn_function, yeccpars2/7}).
 -compile({nowarn_unused_function,  yeccpars2/7}).
@@ -312,27 +312,27 @@ yeccgoto_statements(2=_S, Cat, Ss, Stack, T, Ts, Tzr) ->
 -compile({inline,yeccpars2_2_/1}).
 -dialyzer({nowarn_function, yeccpars2_2_/1}).
 -compile({nowarn_unused_function,  yeccpars2_2_/1}).
--file("/home/bigbug/forter/src/parser.yrl", 0).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 6).
 yeccpars2_2_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-'$undefined'
+                         {___1}
   end | __Stack].
 
 -compile({inline,yeccpars2_4_/1}).
 -dialyzer({nowarn_function, yeccpars2_4_/1}).
 -compile({nowarn_unused_function,  yeccpars2_4_/1}).
--file("/home/bigbug/forter/src/parser.yrl", 0).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 10).
 yeccpars2_4_(__Stack0) ->
  [___1 | __Stack] = __Stack0,
  [begin
-'$undefined'
+                         {___1}
   end | __Stack].
 
 -compile({inline,yeccpars2_7_/1}).
 -dialyzer({nowarn_function, yeccpars2_7_/1}).
 -compile({nowarn_unused_function,  yeccpars2_7_/1}).
--file("/home/bigbug/forter/src/parser.yrl", 8).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 8).
 yeccpars2_7_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
@@ -342,7 +342,7 @@ yeccpars2_7_(__Stack0) ->
 -compile({inline,yeccpars2_9_/1}).
 -dialyzer({nowarn_function, yeccpars2_9_/1}).
 -compile({nowarn_unused_function,  yeccpars2_9_/1}).
--file("/home/bigbug/forter/src/parser.yrl", 9).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 9).
 yeccpars2_9_(__Stack0) ->
  [___3,___2,___1 | __Stack] = __Stack0,
  [begin
@@ -352,12 +352,12 @@ yeccpars2_9_(__Stack0) ->
 -compile({inline,yeccpars2_10_/1}).
 -dialyzer({nowarn_function, yeccpars2_10_/1}).
 -compile({nowarn_unused_function,  yeccpars2_10_/1}).
--file("/home/bigbug/forter/src/parser.yrl", 0).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 5).
 yeccpars2_10_(__Stack0) ->
  [___2,___1 | __Stack] = __Stack0,
  [begin
-'$undefined'
+                                    {{statement, ___1}, ___2}
   end | __Stack].
 
 
--file("/home/bigbug/forter/src/parser.yrl", 17).
+-file("/home/bigbug/lapacke/forter/src/parser.yrl", 17).

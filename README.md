@@ -8,7 +8,11 @@ Build
 -----
     $ rebar3 compile
 
-Execute a file
+Example 
+-----
+forter:parse(forter:file("priv/empty.f")).
+
+Man a file
 -----
     % tokenize(String): Generate a list of tokens from a String input.
     
