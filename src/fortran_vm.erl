@@ -15,9 +15,7 @@ apply(Instruction, F_vm=#f_vm{vars=Vars})->
         {declare, Declaration}->
             case Declaration of 
                 {token_start, _ } -> F_vm;
-                {token_end,   _ } -> F_vm;
-                _ ->
-                    io:format("Unknown declaration: ~w~n", [Declaration]), nok
+                {token_end,   _ } -> F_vm
             end;
 
         {allocate, Allocation}->
@@ -26,22 +24,15 @@ apply(Instruction, F_vm=#f_vm{vars=Vars})->
                     Allocator = fun({identifier, I}, F_vmi=#f_vm{vars=Varsi})->
                         F_vmi#f_vm{vars=dict:store(I, {Type, {}}, Varsi)}
                     end,
-                    lists:foldl(Allocator, F_vm, Identifiers);
-                _ -> 
-                    io:format("Unknown allocation: ~w~n", [Allocation]), nok
+                    lists:foldl(Allocator, F_vm, Identifiers)
             end;
 
         {assign, Assignement}->
             case Assignement of 
                 {{identifier, I}, Expression} ->
                     Value = eval(Expression, F_vm),
-                    F_vm#f_vm{vars = dict:store(I, Value, Vars)};
-                _ -> 
-                    io:format("Unknown assignement: ~w~n", [Assignement]), nok
-            end;
-
-        _ ->
-            io:format("Unknown content ~w~n", [Instruction]), nok
+                    F_vm#f_vm{vars = dict:store(I, Value, Vars)}
+            end
         end.
 
 eval(Expression, F_vm=#f_vm{vars=Vars})->
@@ -50,8 +41,14 @@ eval(Expression, F_vm=#f_vm{vars=Vars})->
             dict:fetch(I, Vars);
         {float, Value} ->
             Value;
-        {{token_operator, '+'}, Lhs, Rhs}->
-            eval(Lhs, F_vm) + eval(Rhs, F_vm)
+        {{token_operator, Operator}, Lhs, Rhs}->
+            case Operator of
+                '+' -> eval(Lhs, F_vm) + eval(Rhs, F_vm);
+                '-' -> eval(Lhs, F_vm) - eval(Rhs, F_vm);
+                '*' -> eval(Lhs, F_vm) * eval(Rhs, F_vm);
+                '/' -> eval(Lhs, F_vm) / eval(Rhs, F_vm)
+            end
+
     end.
 
 fetch(Key, #f_vm{vars=Vars})->

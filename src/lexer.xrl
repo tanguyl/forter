@@ -5,7 +5,7 @@ Real = [0-9]+.[0-9]+
 Str = ['.*']|[".*"]
 WS = (\s+|!.*)
 Type = real
-Operator = \+
+Operator = \+|\-|\*|\/
 
 Rules.
 
