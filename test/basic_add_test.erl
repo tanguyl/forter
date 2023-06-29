@@ -1,7 +1,9 @@
--module(basic_files_test).
+-module(basic_add_test).
+-include_lib("eunit/include/eunit.hrl").
 
 basic_add_test()->
-    Program = "program addNumbers
+   Program = "
+program addNumbers
 
 ! This simple program adds two numbers
    implicit none
@@ -12,10 +14,11 @@ basic_add_test()->
 ! Executable statements
    a = 12.0
    b = 15.0
-   result = a + b
-   print *, 'The total is ', result
+   result = a + b + 2.0
+!  result should be 29
 
 end program addNumbers
-"   ,
-    forter:interpret(Program),
-    1 = 2.
+   ",
+   State  = forter:interpret(Program),
+   Result = fortran_vm:fetch(result, State),
+   Result = 29.0.

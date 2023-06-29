@@ -1,4 +1,4 @@
-program  addNumbers
+program addNumbers
 
 ! This simple program adds two numbers
     implicit none
@@ -10,6 +10,6 @@ program  addNumbers
     a = 12.0
     b = 15.0
     result = a + b
-!    print *, 'The total is ', result
+!   result should be 27
 
-end program  addNumbers
+end program addNumbers
