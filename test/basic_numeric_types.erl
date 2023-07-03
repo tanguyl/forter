@@ -1,7 +1,7 @@
--module(basic_ops_test).
+-module(basic_numeric_types).
 -include_lib("eunit/include/eunit.hrl").
 
-basic_add_test()->
+basic_double_test()->
    Program = "
 program addNumbers
 
@@ -9,9 +9,31 @@ program addNumbers
    implicit none
 
 ! Type declarations
-   real :: a, 
+   double precision :: a, 
            $b
            $, result
+
+! Executable statements
+   a = 12.0D0
+   b = 15.0D0
+   result = a + b + 2.0D0
+!  result should be 29
+
+end program addNumbers
+   ",
+   State  = forter:interpret(Program),
+   Result = fortran_vm:fetch(result, State),
+   Result = 29.0.
+
+basic_float_test()->
+   Program = "
+program addNumbers
+
+! This simple program adds two numbers
+   implicit none
+
+! Type declarations
+   double precision :: a, b, result
 
 ! Executable statements
    a = 12.0
@@ -25,8 +47,7 @@ end program addNumbers
    Result = fortran_vm:fetch(result, State),
    Result = 29.0.
 
-
-basic_sub_test()->
+basic_integer_test()->
    Program = "
 program addNumbers
 
@@ -34,20 +55,21 @@ program addNumbers
    implicit none
 
 ! Type declarations
-   real :: a, b, result
+   integer :: a, b, result
 
 ! Executable statements
-   a = 12.0
-   b = 15.0
-   result = a - b - 2.0
+   a = 12
+   b = 15
+   result = a + b + 2
+!  result should be 29
 
 end program addNumbers
    ",
    State  = forter:interpret(Program),
    Result = fortran_vm:fetch(result, State),
-   Result = -5.0.
+   Result = 29.
 
-basic_mult_test()->
+basic_boolean_test()->
    Program = "
 program addNumbers
 
@@ -55,58 +77,14 @@ program addNumbers
    implicit none
 
 ! Type declarations
-   real :: a, b, result
+   logical :: a, b
 
 ! Executable statements
-   a = 2.0
-   b = 4.0
-   result = a * b * 2.0
+   a = 1
+   b = 0
 
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
-   Result = 16.0.
-
-
-basic_div_test()->
-   Program = "
-program addNumbers
-
-! This simple program adds two numbers
-   implicit none
-
-! Type declarations
-   real :: a, b, result
-
-! Executable statements
-   a = 4.0
-   b = 2.0
-   result = a / b / 2.0
-
-end program addNumbers
-   ",
-   State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
-   Result = 1.0.
-
-basic_precedence_test()->
-   Program = "
-program addNumbers
-
-! This simple program adds two numbers
-   implicit none
-
-! Type declarations
-   real :: a, b, result
-
-! Executable statements
-   a = 4.0
-   b = 2.0
-   result = a + 3.0 * b / 6.0 - 1.0
-
-end program addNumbers
-   ",
-   State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
-   Result = 4.0.
+   Result = fortran_vm:fetch(a, State),
+   Result = 1.

@@ -1,10 +1,13 @@
 Definitions.
 
 Id = [a-zA-Z][0-9a-zA-Z_]*
+Integer = [0-9]+
+Double  = [0-9]+.[0-9]+D0
 Real = [0-9]+.[0-9]+ 
+Logical = 0|1
 Str = ['.*']|[".*"]
 WS = (\s+|!.*)
-Type = real
+Type = real|double\sprecision|logical|integer
 Operator = \+|\-|\*|\/
 
 Rules.
@@ -16,7 +19,7 @@ end{WS}program : {token, {token_end, TokenLine}}.
 %Operations.
 = :  {token,  {token_assign, TokenLine}}.
 :: : {token, {token_double_colon, TokenLine}}.
-{Operator} : {token, {token_operator, TokenLine, list_to_atom(TokenChars)}}.
+{Operator} : {token, {list_to_atom(TokenChars), TokenLine }}.
 
 %Types.
 {Type} : {token, {token_type, TokenLine, list_to_atom(TokenChars)}} .
@@ -24,10 +27,17 @@ end{WS}program : {token, {token_end, TokenLine}}.
 % Separators.
 ,  : {token, {token_comma, TokenLine}}.
 \n : {token, {token_endl, TokenLine}}.
+\(  : {token, {token_bracket_open, TokenLine}}.
+\)  : {token, {token_bracket_close, TokenLine}}.
 
+%Declarations
+parameter : {token, {parameter, TokenLine}}.
 
 %Basic types.
-{Real} : {token, {float, TokenLine, list_to_float(TokenChars)}}.
+{Double} :   {token, {double, TokenLine, list_to_float(remove_lasts(2,TokenChars))}}.
+{Real} :    {token, {float, TokenLine, list_to_float(TokenChars)}}.
+{Integer} :  {token, {integer, TokenLine, list_to_integer(TokenChars)}}.
+{Logical} : {token, {boolean, TokenLine, list_to_integer(TokenChars)}}.
 
 
 %Identifiers
@@ -35,8 +45,11 @@ end{WS}program : {token, {token_end, TokenLine}}.
 
 % Comments.
 {WS}+ : skip_token.
+\n{WS}\$ : skip_token.
 implicit{WS}none : skip_token.
 
 Erlang code.
 
-
+remove_lasts(N, List)->
+    Size = length(List),
+    lists:sublist(List, 1, Size-N).

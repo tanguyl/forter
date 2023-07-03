@@ -27,6 +27,9 @@ apply(Instruction, F_vm=#f_vm{vars=Vars})->
                     lists:foldl(Allocator, F_vm, Identifiers)
             end;
 
+        {parameter, Assignements}->
+            lists:foldl(fun (A,F)->fortran_vm:apply({assign, A}, F) end, F_vm, Assignements);
+
         {assign, Assignement}->
             case Assignement of 
                 {{identifier, I}, Expression} ->
@@ -36,20 +39,35 @@ apply(Instruction, F_vm=#f_vm{vars=Vars})->
         end.
 
 eval(Expression, F_vm=#f_vm{vars=Vars})->
+    Result =
     case Expression of
         {identifier, I} ->
-            dict:fetch(I, Vars);
+            R = dict:fetch(I, Vars),
+            io:format("Fetched ~w~n", [R]),
+            R;
         {float, Value} ->
+            io:format("float: ~w~n", [Value]),
             Value;
-        {{token_operator, Operator}, Lhs, Rhs}->
+        {double, Value} ->
+            io:format("double: ~w~n", [Value]),
+            Value;
+        {integer, Value} ->
+            io:format("integer: ~w~n", [Value]),
+            Value;
+        {boolean, Value} ->
+            io:format("boolean: ~w~n", [Value]),
+            Value;
+        
+        {{Operator}, Lhs, Rhs}->
             case Operator of
                 '+' -> eval(Lhs, F_vm) + eval(Rhs, F_vm);
                 '-' -> eval(Lhs, F_vm) - eval(Rhs, F_vm);
                 '*' -> eval(Lhs, F_vm) * eval(Rhs, F_vm);
                 '/' -> eval(Lhs, F_vm) / eval(Rhs, F_vm)
             end
-
-    end.
+    end,
+    io:format("Expression resulted in ~w~n", [Result]),
+    Result.
 
 fetch(Key, #f_vm{vars=Vars})->
     dict:fetch(Key, Vars).
