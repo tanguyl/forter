@@ -2,8 +2,8 @@ Definitions.
 
 Id = [a-zA-Z][0-9a-zA-Z_]*
 Integer = [0-9]+
-Double  = [0-9]+.[0-9]+D0
-Real = [0-9]+.[0-9]+ 
+Double  = [0-9]+\.[0-9]+D0
+Real = [0-9]+\.[0-9]+ 
 Logical = 0|1
 Str = ['.*']|[".*"]
 WS = (\s+|!.*)
