@@ -63,3 +63,22 @@ end program do_iterate
    State  = forter:interpret(Program),
    Result = fortran_interpreter:fetch(result, State),
    Result = 10.
+
+
+nested_do_loop_test()->
+   Program = "
+program do_iterate
+      integer :: result0, result1
+      result = 0
+
+      do 100 i = 0, 5
+         do 200 j = 0, 3 
+            result = result + j
+         200 continue
+      100 continue
+
+end program do_iterate
+",
+   State  = forter:interpret(Program),
+   Result = fortran_interpreter:fetch(result, State),
+   Result = 15.
