@@ -16,6 +16,9 @@ Rules.
 program : {token, {token_start, TokenLine}}.
 end{WS}program : {token, {token_end, TokenLine}}.
 
+%Program flow.
+go{WS}to : {token, {token_goto, TokenLine}}.
+
 %Operations.
 = :  {token,  {token_assign, TokenLine}}.
 :: : {token, {token_double_colon, TokenLine}}.
@@ -47,6 +50,7 @@ parameter : {token, {parameter, TokenLine}}.
 {WS}+ : skip_token.
 \n{WS}\$ : skip_token.
 implicit{WS}none : skip_token.
+
 
 Erlang code.
 

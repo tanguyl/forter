@@ -22,7 +22,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 29.0.
 
 
@@ -44,7 +44,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = -5.0.
 
 basic_mult_test()->
@@ -65,7 +65,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 16.0.
 
 
@@ -87,7 +87,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 1.0.
 
 basic_precedence_test()->
@@ -108,5 +108,5 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 4.0.

@@ -22,7 +22,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 29.0.
 
 basic_float_test()->
@@ -44,7 +44,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 29.0.
 
 basic_integer_test()->
@@ -66,7 +66,7 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 29.
 
 basic_boolean_test()->
@@ -86,5 +86,5 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(a, State),
+   Result = fortran_interpreter:fetch(a, State),
    Result = 1.

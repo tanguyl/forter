@@ -17,5 +17,5 @@ program addNumbers
 end program addNumbers
    ",
    State  = forter:interpret(Program),
-   Result = fortran_vm:fetch(result, State),
+   Result = fortran_interpreter:fetch(result, State),
    Result = 29.0.

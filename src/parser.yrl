@@ -1,9 +1,10 @@
 Nonterminals
-statements statement declare allocate identifier_list expression value assign identifier_list_declaration .
+statements statement declare allocate identifier_list expression value assign identifier_list_declaration.
 
 Terminals 
 identifier token_start token_end token_endl token_comma token_double_colon token_type
- token_assign float double integer boolean parameter '+' '-' '*' '/' token_bracket_close token_bracket_open.
+ token_assign float double integer boolean parameter '+' '-' '*' '/' token_bracket_close token_bracket_open
+token_goto.
 
 Rootsymbol statements.
 
@@ -19,6 +20,7 @@ statement -> declare token_endl: {declare, '$1'}.
 statement -> allocate token_endl: {allocate, '$1'}.
 statement -> assign token_endl: {assign, '$1'}.
 statement -> token_endl: {token_endl}.
+statement -> token_goto integer: {goto, unwrap('$2')}.
 
 statement -> integer: {label, unwrap('$1')}.
 statement -> parameter token_bracket_open identifier_list_declaration token_bracket_close token_endl: {parameter, '$3'}.

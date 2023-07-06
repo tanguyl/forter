@@ -13,4 +13,4 @@ parse(String)->
 
 interpret(String)->
     Instructions = parse(String),
-    lists:foldl(fun fortran_vm:apply/2, fortran_vm:new(), Instructions).
+    fortran_interpreter:run(fortran_interpreter:new(Instructions)).
