@@ -18,6 +18,7 @@ end{WS}program : {token, {token_end, TokenLine}}.
 
 %Program flow.
 go{WS}to : {token, {token_goto, TokenLine}}.
+do{WS}   : {token, {token_do, TokenLine}}.
 
 %Operations.
 = :  {token,  {token_assign, TokenLine}}.
@@ -32,9 +33,10 @@ go{WS}to : {token, {token_goto, TokenLine}}.
 \n : {token, {token_endl, TokenLine}}.
 \(  : {token, {token_bracket_open, TokenLine}}.
 \)  : {token, {token_bracket_close, TokenLine}}.
+{WS}continue : {token, {token_endl, TokenLine}}.
 
 %Declarations
-parameter : {token, {parameter, TokenLine}}.
+{WS}parameter : {token, {parameter, TokenLine}}.
 
 %Basic types.
 {Double} :   {token, {double, TokenLine, list_to_float(remove_lasts(2,TokenChars))}}.

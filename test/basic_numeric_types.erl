@@ -60,7 +60,8 @@ program addNumbers
 ! Executable statements
    a = 12
    b = 15
-   result = a + b + 2
+   result = a + 2
+   result = result + b
 !  result should be 29
 
 end program addNumbers

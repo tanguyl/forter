@@ -1,7 +1,7 @@
 -module(fortran_interpreter).
 -export([new/1, run/1, apply/2, fetch/2]).
 
--record(finter,{current, instructions, variables, labels}).
+-record(finter,{current, instructions, variables, labels, stack}).
 
 new(Instructions)->
     Extractor = fun({P,I}, L)->
@@ -11,30 +11,37 @@ new(Instructions)->
             _ -> L
         end
     end,
-    LabelsPos = lists:foldl(Extractor, [], lists:enumerate(Instructions)),
-    io:format("~w~n", [LabelsPos]),
-    #finter{current = Instructions, instructions = Instructions, variables = dict:new(), labels = dict:from_list(LabelsPos)}.
+    EnumeratedInstructions = lists:enumerate(Instructions),
+    LabelsPos = lists:foldl(Extractor, [], EnumeratedInstructions),
+    #finter{current = 1, instructions = Instructions, variables = dict:new(), labels = dict:from_list(LabelsPos), stack=[]}.
 
 run(Finter=#finter{})->
     Loop = 
-        fun F(FinterI=#finter{current=[Current | Next]})->
-            F(fortran_interpreter:apply(Current, FinterI#finter{current=Next}));
-        F(FinterI=#finter{current=[]})->
+        fun F(FinterI=#finter{current=I, instructions = Instr}) when I =< length(Instr)->
+            F(fortran_interpreter:apply(I, FinterI#finter{current=I+1}));
+        F(FinterI=#finter{})->
             FinterI
     end,
     io:format("~w~n", [Finter]),
     Loop(Finter).
 
 
-apply(Instruction, Finter=#finter{instructions=Instructions, variables=Vars, labels=Labels})->
+apply(I, Finter=#finter{current=Current, instructions=Instructions, variables=Vars, labels=Labels, stack=Stack})->
+    % I is either an instruction by itself, or the instruction number.
+    Instruction = if 
+        is_integer(I) -> io:format("Instruction ~w~n", [I]), lists:nth(I, Instructions);
+        true          -> I
+    end,
+    
     io:format("Applying ~w~n", [Instruction]),
+
     case Instruction of 
 
         {allocate, Allocation}->
             case Allocation of 
                 {{token_type, Type}, Identifiers} ->
-                    Allocator = fun({identifier, I}, Finteri=#finter{variables=Varsi})->
-                        Finteri#finter{variables=dict:store(I, {Type, {}}, Varsi)}
+                    Allocator = fun({identifier, Id}, Finteri=#finter{variables=Varsi})->
+                        Finteri#finter{variables=dict:store(Id, {Type, {}}, Varsi)}
                     end,
                     lists:foldl(Allocator, Finter, Identifiers)
             end;
@@ -44,14 +51,38 @@ apply(Instruction, Finter=#finter{instructions=Instructions, variables=Vars, lab
 
         {assign, Assignement}->
             case Assignement of 
-                {{identifier, I}, Expression} ->
+                {{identifier, Id}, Expression} ->
                     Value = eval(Expression, Finter),
-                    Finter#finter{variables= dict:store(I, Value, Vars)}
+                    Finter#finter{variables= dict:store(Id, Value, Vars)}
             end;
 
-        {goto, Label}->
+        {goto, {label,Label}}->
             JumpPos = dict:fetch(Label, Labels),
-            Finter#finter{current=lists:sublist(Instructions, JumpPos, length(Instructions))};
+            Finter#finter{current=JumpPos};
+
+        {label, Label}->
+            io:format("Label is ~w, Stack is ~w~n", [Label, Stack]),
+            case Stack of 
+                [{Instruction, Position, _}|_] -> Finter#finter{current=Position}; % Do loop.
+                _                       -> Finter
+            end;
+
+        {do, Label, {Identifier, Iteration}}->
+            case Stack of 
+                [{Label, _, {_, End, Inc}} | Tail] ->
+                    % This do was already executed.
+                    Value = fetch(Identifier, Finter) + Inc,
+                    io:format("Value vs end: ~w~w~n", [Value, End]),
+                    case Value of 
+                        End -> fortran_interpreter:apply({goto, Label}, Finter#finter{stack=Tail});
+                        _   -> fortran_interpreter:apply({assign, {Identifier, {integer, Value}}}, Finter)
+                    end;
+                _ ->
+                    % First time the loop is done: evaluate iteration.
+                    IterationValues = list_to_tuple(lists:map( fun (Exp) -> eval(Exp, Finter) end, Iteration)),
+                    Start = element(1, IterationValues),
+                    fortran_interpreter:apply({assign, {Identifier, {integer, Start}}}, Finter#finter{stack = [{Label, Current-1, IterationValues}] ++ Stack})
+            end;
 
         Statement ->
             io:format("Skipping statement: ~w~n", [Statement]),
@@ -89,5 +120,10 @@ eval(Expression, Finter=#finter{variables=Vars})->
     io:format("Expression resulted in ~w~n", [Result]),
     Result.
 
-fetch(Key, #finter{variables=Vars})->
+fetch(Entry, #finter{variables=Vars})->
+    Key = 
+    case Entry of 
+        {identifier, Name} -> Name;
+        _ -> Entry
+    end,
     dict:fetch(Key, Vars).

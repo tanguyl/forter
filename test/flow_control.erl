@@ -21,6 +21,7 @@ end program addNumbers
    Result = fortran_interpreter:fetch(result, State),
    Result = 29.
 
+
 goto_test()->
    Program = "
 program addNumbers
@@ -45,3 +46,20 @@ end program addNumbers
    Result = fortran_interpreter:fetch(result, State),
    Result = 27.
 
+
+do_loop_test()->
+   Program = "
+program do_iterate
+      integer :: result0, result1
+      result = 0
+
+      do 100 loop = 0, 5
+         result = result + loop
+      100 continue
+
+!  result0 should be 10
+end program do_iterate
+",
+   State  = forter:interpret(Program),
+   Result = fortran_interpreter:fetch(result, State),
+   Result = 10.
