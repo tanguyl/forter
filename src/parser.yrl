@@ -1,10 +1,10 @@
 Nonterminals
-statements statement declare allocate identifier_list expression value assign identifier_list_declaration iteration expression_list
+statements statement declare allocate identifier_list expression binary_expression unary_expression value assign identifier_list_declaration iteration expression_list
 label.
 
 Terminals 
 identifier token_start token_end token_endl token_comma token_double_colon token_type
- token_assign float double integer boolean parameter '+' '-' '*' '/' token_bracket_close token_bracket_open
+ token_assign float double integer boolean parameter '+' '-' '*' '/' '.not.' token_bracket_close token_bracket_open
 token_goto token_do.
 
 Rootsymbol statements.
@@ -47,11 +47,16 @@ identifier_list_declaration -> assign token_comma identifier_list_declaration: [
 identifier_list_declaration -> assign: ['$1'].
 
 
-expression -> expression '+' expression: {unwrap('$2'), '$1', '$3'}.
-expression -> expression '-' expression: {unwrap('$2'), '$1', '$3'}.
-expression -> expression '*' expression: {unwrap('$2'), '$1', '$3'}.
-expression -> expression '/' expression: {unwrap('$2'), '$1', '$3'}.
+expression -> binary_expression: '$1'.
+expression -> unary_expression: '$1'.
 expression -> value: '$1'.
+
+binary_expression -> expression '+' expression: {value('$2'), '$1', '$3'}.
+binary_expression -> expression '-' expression: {value('$2'), '$1', '$3'}.
+binary_expression -> expression '*' expression: {value('$2'), '$1', '$3'}.
+binary_expression -> expression '/' expression: {value('$2'), '$1', '$3'}.
+
+unary_expression -> '.not.' expression: {'not', '$2'}.
 
 value -> identifier: unwrap('$1').
 value -> float: unwrap('$1').
@@ -62,5 +67,7 @@ value -> boolean: unwrap('$1').
 Erlang code.
 unwrap({Type, _, Value})-> {Type, Value};
 unwrap({Type, _}) -> {Type}.
+
+value({Value, _}) -> Value;
 value({_, _, Value}) -> Value.
     

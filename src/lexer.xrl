@@ -8,7 +8,7 @@ Logical = (\.true\.)|(\.false\.)
 Str = ['.*']|[".*"]
 WS = (\s+|!.*)
 Type = real|double\sprecision|logical|integer
-Operator = \+|\-|\*|\/
+Operator = \+|\-|\*|\/|\.not\.
 
 Rules.
 

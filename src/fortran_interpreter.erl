@@ -109,12 +109,18 @@ eval(Expression, Finter=#finter{variables=Vars})->
             io:format("boolean: ~w~n", [Value]),
             Value;
         
-        {{Operator}, Lhs, Rhs}->
+        {Operator, Lhs, Rhs}->
             case Operator of
                 '+' -> eval(Lhs, Finter) + eval(Rhs, Finter);
                 '-' -> eval(Lhs, Finter) - eval(Rhs, Finter);
                 '*' -> eval(Lhs, Finter) * eval(Rhs, Finter);
                 '/' -> eval(Lhs, Finter) / eval(Rhs, Finter)
+            end;
+        
+        {Operator, Rhs}->
+            Value = eval(Rhs, Finter),
+            case Operator of
+                'not' -> if Value == 0 -> 1; true -> 0 end
             end
     end,
     io:format("Expression resulted in ~w~n", [Result]),
