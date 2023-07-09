@@ -8,7 +8,7 @@ Logical = (\.true\.)|(\.false\.)
 Str = ['.*']|[".*"]
 WS = (\s+|!.*)
 Type = real|double\sprecision|logical|integer
-Operator = \+|\-|\*|\/|\.not\.
+Operator = \+|\-|\*|\/|\.not\.|\.and\.|\.or\.
 
 Rules.
 
@@ -17,8 +17,11 @@ program : {token, {token_start, TokenLine}}.
 end{WS}program : {token, {token_end, TokenLine}}.
 
 %Program flow.
-go{WS}to : {token, {token_goto, TokenLine}}.
-do{WS}   : {token, {token_do, TokenLine}}.
+go{WS}to  : {token, {token_goto, TokenLine}}.
+do{WS}    : {token, {token_do, TokenLine}}.
+if        : {token, {token_if, TokenLine}}.
+end{WS}if : {token, {token_end_if, TokenLine}}.
+then      : {token, {token_then, TokenLine}}.
 
 %Operations.
 = :  {token,  {token_assign, TokenLine}}.

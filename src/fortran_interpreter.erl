@@ -84,6 +84,16 @@ apply(I, Finter=#finter{current=Current, instructions=Instructions, variables=Va
                     fortran_interpreter:apply({assign, {Identifier, {integer, Start}}}, Finter#finter{stack = [{Label, Current-1, IterationValues}] ++ Stack})
             end;
 
+        % Single if statement.
+        {'if', Expression} ->
+            Value = eval(Expression, Finter),
+            if 
+                Value == 1 ->
+                    Finter;
+                true ->
+                    Finter#finter{current = Current + 1} % Skip next statement.
+                end;
+
         Statement ->
             io:format("Skipping statement: ~w~n", [Statement]),
             Finter
@@ -110,13 +120,17 @@ eval(Expression, Finter=#finter{variables=Vars})->
             Value;
         
         {Operator, Lhs, Rhs}->
+            {Lv, Rv} = {eval(Lhs, Finter), eval(Rhs, Finter)},
             case Operator of
-                '+' -> eval(Lhs, Finter) + eval(Rhs, Finter);
-                '-' -> eval(Lhs, Finter) - eval(Rhs, Finter);
-                '*' -> eval(Lhs, Finter) * eval(Rhs, Finter);
-                '/' -> eval(Lhs, Finter) / eval(Rhs, Finter)
+                '+' -> Lv + Rv;
+                '-' -> Lv - Rv;
+                '*' -> Lv * Rv;
+                '/' -> Lv / Rv;
+
+                'and' -> if Lv == 1 andalso Rv ==  1 -> 1; true -> 0 end;
+                'or'  -> if Lv =/= 0 orelse Rv =/= 0 -> 1; true -> 0 end
             end;
-        
+
         {Operator, Rhs}->
             Value = eval(Rhs, Finter),
             case Operator of
