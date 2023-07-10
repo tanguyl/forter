@@ -1,19 +1,51 @@
 -module(fortran_interpreter).
 -export([new/1, run/1, apply/2, fetch/2]).
 
--record(finter,{current, instructions, variables, labels, stack}).
+-record(finter,{current, instructions, variables, labels, ifs, stack}).
 
 new(Instructions)->
-    Extractor = fun({P,I}, L)->
+    EnumeratedInstructions = lists:enumerate(Instructions),
+
+    % Extract label positions
+    LabelExtractor = fun({Pos,I}, L)->
         case I of 
             % Labels points at next instruction.
-            {label, Id} -> [{Id, P + 1}] ++ L;
+            {label, Id} -> [{Id, Pos + 1}] ++ L;
             _ -> L
         end
     end,
-    EnumeratedInstructions = lists:enumerate(Instructions),
-    LabelsPos = lists:foldl(Extractor, [], EnumeratedInstructions),
-    #finter{current = 1, instructions = Instructions, variables = dict:new(), labels = dict:from_list(LabelsPos), stack=[]}.
+    LabelsPos = lists:foldl(LabelExtractor, [], EnumeratedInstructions),
+
+    % Detect if_group, group their expression with their position.
+    % Stack is used for nested if_then.
+    IfGroupExtractor = fun({Pos,I}, State={GroupId, Stack, Table})->
+        io:format("Processing ~w with state ~w~n", [I, {GroupId, Stack}]),
+        case I of 
+            {if_then, Exp} -> {        Pos+1, [Pos+1]++Stack, dict:store (  Pos+1, [{Pos + 1,         Exp}], Table)};
+            {else_if, Exp} -> {      GroupId,          Stack, dict:append(GroupId,  {Pos + 1,         Exp} , Table)};
+            {end_if}       -> {hd(tl(Stack)),      tl(Stack), dict:append(GroupId,  {Pos + 1, {boolean, 1}}, Table)};
+            _              -> State
+        end
+    end,
+    EndState = lists:foldl(IfGroupExtractor, {0, [0], dict:new()}, EnumeratedInstructions),
+    IfTable  = element(3, EndState),
+
+    % Associate each else_if to the end_if.
+    IfEndMapper = fun({_, Values}, Acc)->
+        if 
+            length(Values) > 2->
+                {End,_}  = lists:last(Values), 
+                lists:foldl(fun({P,_}, AccI) -> dict:store(P, End, AccI) end, Acc, lists:sublist(Values, 2, length(Values) - 2));
+            
+            true ->
+                Acc
+        end
+    end,
+    IfEndTable = lists:foldl(IfEndMapper, dict:new(), dict:to_list(IfTable)),
+
+    io:format("Ifs table is: ~w~n", [dict:to_list(IfTable)]),
+    Skip = fun(_,_)-> this_is_awkward_same_key_ifs_merge end,
+    #finter{current = 1, instructions = Instructions, variables = dict:new(), labels = dict:from_list(LabelsPos), ifs = dict:merge(Skip, IfTable, IfEndTable), stack=[]}.
 
 run(Finter=#finter{})->
     Loop = 
@@ -26,7 +58,7 @@ run(Finter=#finter{})->
     Loop(Finter).
 
 
-apply(I, Finter=#finter{current=Current, instructions=Instructions, variables=Vars, labels=Labels, stack=Stack})->
+apply(I, Finter=#finter{current=Current, instructions=Instructions, variables=Vars, labels=Labels, ifs=Ifs, stack=Stack})->
     % I is either an instruction by itself, or the instruction number.
     Instruction = if 
         is_integer(I) -> io:format("Instruction ~w~n", [I]), lists:nth(I, Instructions);
@@ -87,19 +119,29 @@ apply(I, Finter=#finter{current=Current, instructions=Instructions, variables=Va
         % Single if statement.
         {'if', Expression} ->
             Value = eval(Expression, Finter),
-            if 
-                Value == 1 ->
-                    Finter;
-                true ->
-                    Finter#finter{current = Current + 1} % Skip next statement.
+            if  Value == 0 -> Finter#finter{current = Current + 1}; % Skip next statement;
+                true       -> Finter
                 end;
+
+        % If block statements
+        {'if_then', _} ->
+            Blocks    = dict:fetch(Current, Ifs),
+            io:format("Blocks are ~w~n", [Blocks]),
+            [{P,_}|_] = lists:dropwhile(fun({_,E}) -> eval(E, Finter) == 0 end, Blocks), % Select first branch which evaluates true
+            Finter#finter{current=P};
+
+        {'else_if', _} ->
+            % 'if_then' jumps to the correct branch. If 'else_if' is reached, the correct branch already executed; so jump to end.
+            Finter#finter{current=dict:fetch(Current, Ifs)};
 
         Statement ->
             io:format("Skipping statement: ~w~n", [Statement]),
             Finter
         end.
 
+
 eval(Expression, Finter=#finter{variables=Vars})->
+    io:format("Evaluating ~w ", [Expression]),
     Result =
     case Expression of
         {identifier, I} ->

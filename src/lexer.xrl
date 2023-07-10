@@ -20,6 +20,7 @@ end{WS}program : {token, {token_end, TokenLine}}.
 go{WS}to  : {token, {token_goto, TokenLine}}.
 do{WS}    : {token, {token_do, TokenLine}}.
 if        : {token, {token_if, TokenLine}}.
+else      : {token, {token_else, TokenLine}}.
 end{WS}if : {token, {token_end_if, TokenLine}}.
 then      : {token, {token_then, TokenLine}}.
 
@@ -53,7 +54,7 @@ then      : {token, {token_then, TokenLine}}.
 
 % Comments.
 {WS}+ : skip_token.
-\n{WS}\$ : skip_token.
+\n{WS}*\$ : skip_token.
 implicit{WS}none : skip_token.
 
 
