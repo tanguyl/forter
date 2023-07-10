@@ -63,4 +63,20 @@ end program if_test
 
 ",
     [a, b],
-    [1,4]).
+    [1, 4]).
+
+single_ifelse_test()->
+    runner:run("
+program if_test
+    integer :: a, b
+
+    if (.true.) then
+        a = 1
+        b = 2
+    end if
+
+end program if_test
+
+",
+    [a, b],
+    [1, 2]).

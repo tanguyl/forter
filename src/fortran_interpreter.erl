@@ -124,10 +124,12 @@ apply(I, Finter=#finter{current=Current, instructions=Instructions, variables=Va
                 end;
 
         % If block statements
+        % Retrieve all boolean branching expressions, execute the first that is true.
+        % else is coded as an else if true.
         {'if_then', _} ->
             Blocks    = dict:fetch(Current, Ifs),
             io:format("Blocks are ~w~n", [Blocks]),
-            [{P,_}|_] = lists:dropwhile(fun({_,E}) -> eval(E, Finter) == 0 end, Blocks), % Select first branch which evaluates true
+            [{P,_}|_] = lists:dropwhile(fun({_,E}) -> eval(E, Finter) == 0 end, Blocks), 
             Finter#finter{current=P};
 
         {'else_if', _} ->
